@@ -1,0 +1,11 @@
+﻿Build started 12/11/2015 1:14:14 PM.
+     1>Project "C:\Users\v-yuyzhu\Documents\Visual Studio 2015\Projects\foxitSDK\foxitSDK\foxitSDK.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         foxitSDK.vcxproj -> C:\Users\v-yuyzhu\Documents\Visual Studio 2015\Projects\foxitSDK\Debug\foxitSDK\foxitSDK.dll
+       _GenerateProjectPriFileCore:
+         C:\Program Files (x86)\Windows Kits\10\bin\x64\MakePri.exe New -ProjectRoot "C:\Users\v-yuyzhu\Documents\Visual Studio 2015\Projects\foxitSDK\foxitSDK\\" -ConfigXml Debug\priconfig.xml -OutputFile "C:\Users\v-yuyzhu\Documents\Visual Studio 2015\Projects\foxitSDK\Debug\foxitSDK\foxitSDK.pri" -IndexName foxitSDK -Verbose -Overwrite  
+     1>Done Building Project "C:\Users\v-yuyzhu\Documents\Visual Studio 2015\Projects\foxitSDK\foxitSDK\foxitSDK.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.18

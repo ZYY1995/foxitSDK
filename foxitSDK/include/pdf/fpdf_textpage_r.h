@@ -1,0 +1,1076 @@
+/**
+ * Copyright (C) 2003-2015, Foxit Software Inc..
+ * All Rights Reserved.
+ *
+ * http://www.foxitsoftware.com
+ *
+ * The following code is copyrighted and contains proprietary information and trade secrets of Foxit Software Inc..
+ * You cannot distribute any part of Foxit PDF SDK to any third party or general public, 
+ * unless there is a separate license agreement with Foxit Software Inc. which explicitly grants you such rights.
+ *
+ * @file	fpdf_textpage_r.h
+ * @brief	Header file for \ref FPDFTEXT "PDF Text" module of Foxit PDF SDK.
+ * @details	This header file providers access to PDF text information.<br>
+ *			It contains:<br>
+ *			<ul>
+ *			<li>1. Extract text data in PDF page.</li>
+ * 			<li>2. Select text by range or rectangle area.</li>
+ *			<li>3. Search text in PDF page.</li>
+ *			<li>4. Retrieve hyperlinks in PDF page.</li>
+ *			</ul>
+ *
+ * @note	If you want to purchase Foxit PDF SDK license and use ANY of the following functions, please request for enabling <b>Standard module</b> explicitly.
+ */
+
+#ifndef _FSPDF_TEXTPAGE_R_H_
+#define _FSPDF_TEXTPAGE_R_H_
+
+/** 
+ * @defgroup	FPDFTEXT PDF Text 
+ * @brief		Definitions for access to PDF text operation.<br>
+ *				Definitions and functions in this module are included in fpdf_textpage_r.h.<br>
+ *				Module: PDFTextPage<br>
+ *				License Identifier: PDFTextPage/All<br>
+ *				Available License Right: Reading
+ * @details		This module contains following features:<br>
+ *				<ul>
+ *				<li>1. Text page:
+ *					<ul>
+ *					<li>a. Load or release a text page, retrieve characters data, get a character by position or direction.</li>
+ *					<li>b. Text page can be loaded from a PDF page directly or be retrieved from a reflowed page.</li>
+ *					</ul>
+ *				</li>
+ *				<li>2. Text selection:
+ *					<ul>
+ *					<li>a. Select text by characters range or by a rectangle area, retrieve bounding box of selected area,
+ *						   and enumerate text pieces in selected result.</li>
+ *					<li>b. Text selection can be used for not only pure selection but text search and hyperlink extraction.
+ *						   Text selection is a common expression a sequential text data.</li>
+ *					</ul>
+ *				</li>
+ *				<li>3. Text search: start a text search in a PDF page, find next or previous occurrence, and get search result as a text selection object.</li>
+ *				<li>4. Text link: extract hyperlinks from page contents, enumerate hyperlinks and get the result as a text selection.</li>
+ *				</ul>
+ */
+/**@{*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/********************************************************************************/
+/* Base definitions for Text                                                    */
+/*                                                                              */
+/* Handle definitions, macro definitions, data structure                        */
+/********************************************************************************/
+#ifndef _FSPDF_DEF_HANDLE_TEXTPAGE_
+#define _FSPDF_DEF_HANDLE_TEXTPAGE_
+
+/** @brief	Handle type to PDF text page. */
+FSCRT_DEFINEHANDLE(FSPDF_TEXTPAGE);
+
+#endif /* _FSPDF_DEF_HANDLE_TEXTPAGE_ */
+
+#ifndef _FSPDF_DEF_HANDLE_TEXTSELECTION_
+#define _FSPDF_DEF_HANDLE_TEXTSELECTION_
+
+/** @brief	Handle type to PDF text selection. */
+FSCRT_DEFINEHANDLE(FSPDF_TEXTSELECTION);
+
+#endif /* _FSPDF_DEF_HANDLE_TEXTSELECTION_ */
+
+#ifndef _FSPDF_DEF_HANDLE_TEXTSEARCH_
+#define _FSPDF_DEF_HANDLE_TEXTSEARCH_
+
+/** @brief	Handle type to PDF text search. */
+FSCRT_DEFINEHANDLE(FSPDF_TEXTSEARCH);
+
+#endif /* _FSPDF_DEF_HANDLE_TEXTSEARCH_ */
+
+#ifndef _FSPDF_DEF_HANDLE_TEXTLINK_
+#define _FSPDF_DEF_HANDLE_TEXTLINK_
+
+/** @brief	Handle type to PDF text link. */
+FSCRT_DEFINEHANDLE(FSPDF_TEXTLINK);
+
+#endif /* _FSPDF_DEF_HANDLE_TEXTLINK_ */
+
+#ifndef _FSPDF_DEF_MACRO_TEXTDIRECTION_
+#define _FSPDF_DEF_MACRO_TEXTDIRECTION_
+/** 
+ * @deprecated	Current macro definitions have been deprecated with function ::FSPDF_TextPage_GetNextCharIndexByDirection, since Foxit PDF SDK 4.3. 
+ *				So, not recommend to use current function any more.
+ * @name	Macro Definitions for Text Direction Flags
+ * @note	These are used in function ::FSPDF_TextPage_GetNextCharIndexByDirection.
+ */
+/**@{*/
+
+/** @brief	Text direction: left. */
+#define FSPDF_TEXTDIRECTION_LEFT		-1
+/** @brief	Text direction: right. */
+#define FSPDF_TEXTDIRECTION_RIGHT		1
+/** @brief	Text direction: up. */
+#define FSPDF_TEXTDIRECTION_UP			-2
+/** @brief	Text direction: down. */
+#define FSPDF_TEXTDIRECTION_DOWN		2
+
+/**@}*/
+#endif /* _FSPDF_DEF_MACRO_TEXTDIRECTION_ */
+
+#ifndef _FSPDF_DEF_MACRO_TEXTPAGE_CHARSTATE_
+#define _FSPDF_DEF_MACRO_TEXTPAGE_CHARSTATE_
+/**
+ * @name	Macro Definitions for Character State
+ * @note	These are used in function ::FSPDF_TextPage_GetCharInfo.
+ */
+/**@{*/
+
+/** @brief	Normal character. */
+#define FSPDF_TEXTPAGE_CHARSTATE_NORMAL			1	
+/** @brief	Character is generated by Foxit, such as space character. */
+#define FSPDF_TEXTPAGE_CHARSTATE_GENERATED		2 
+/** @brief	Character doesn't have its own unicode value . */
+#define FSPDF_TEXTPAGE_CHARSTATE_NONUNICODE		3
+
+/**@}*/
+#endif /* _FSPDF_DEF_MACRO_TEXTPAGE_CHARSTATE_ */
+
+
+#ifndef _FSPDF_DEF_MACRO_TEXT_PARSEOPTION
+#define _FSPDF_DEF_MACRO_TEXT_PARSEOPTION
+/**
+ * @name	Macro Definitions for PDF Text Page Parsing Flags
+ */
+/**@{*/
+
+/** @brief	Parse the text content of PDF page by the stream order.*/
+#define FSPDF_TEXT_PARSEOPTION_STREAMORDER		0x0001
+/** @brief	Parse the text content of PDF page with outputting the hyphen on a line feed.*/
+#define FSPDF_TEXT_PARSEOPTION_OUTPUTHYPHEN		0x0002
+
+/**@}*/
+#endif /* _FSPDF_DEF_MACRO_TEXT_PARSEOPTION */
+
+#ifndef _FSPDF_DEF_STRUCTURE_TEXTPAGE_CHARINFO_
+#define _FSPDF_DEF_STRUCTURE_TEXTPAGE_CHARINFO_
+
+/**
+ * @brief	Structure for character's information definition
+ */
+typedef struct _TEXTPAGE_CHARINFO_
+{
+	/** 
+	 * @brief	Font handle of the character. 
+	 * 
+	 * @details	This handle can be used by font handle related functions to get more information about the font. <br>
+	 *			If character is generated, <i>font</i> may be is <b>NULL</b>. 
+	 */
+	FSCRT_FONT 		font;			
+	/** 
+	 * @brief	State of character. 
+	 *
+	 * @details	Please refer to macro definitions <b>FSPDF_TEXTPAGE_CHARSTATE_XXXX</b> and this should be one of these macros. 
+	 */
+	FS_INT32 		state;
+	/** 
+	 * @brief	Font size of character, measured in points (about 1/72 inch). 
+	 *
+	 * @details	This is the typographic size of font referred to as "em size".
+	 */
+	FS_FLOAT 		fontSize;
+	/** @brief	X position of the character origin. -1 means error. */
+	FS_FLOAT 		originX;
+	/** @brief	Y position of the character origin. -1 means error. */
+	FS_FLOAT 		originY;
+	/** @brief	4 positions (left, bottom, right, top)of character's bounding box. */
+	FSCRT_RECTF		bbox;
+	/** @brief	Matrix of character. */
+	FSCRT_MATRIX 	matrix;
+}FSPDF_TEXTPAGE_CHARINFO;
+
+#endif /* _FSPDF_DEF_STRUCTURE_TEXTPAGE_CHARINFO_ */
+
+/*******************************************************************************/
+/* Text page                                                                   */
+/*******************************************************************************/
+/**
+ * @brief	Prepare information of all characters in a page.
+ *
+ * @param[in]	pdfPage		Handle to a valid <b>FSCRT_PAGE</b> object.
+ * @param[out]	textPage	Pointer to a <b>FSPDF_TEXTPAGE</b> handle to receive a new PDF text page handle if successful.<br>
+ * 							Application should release this handle if not use it any more by calling function ::FSPDF_TextPage_Release.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>pdfPage</i> or <i>textPage</i> is a <b>NULL</b> pointer, or parameter <i>flags</i> is invalid.<br>
+ * 			::FSCRT_ERRCODE_INVALIDTYPE if parameter <i>pdfPage</i> is not a type of PDF page.<br>
+ * 			::FSCRT_ERRCODE_INVALIDLICENSE if the current license is not authorized or access to text page is not allowed.<br>
+ * 			::FSCRT_ERRCODE_NOTPARSED if parameter <i>pdfPage</i> is not parsed.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ * 			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot load text page because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @note	The application must call function ::FSPDF_TextPage_Release to release the loaded text page handle.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>pdfPage</i>: this handle is long-term partially recoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_Load(FSCRT_PAGE pdfPage, FSPDF_TEXTPAGE* textPage);
+
+/**
+ * @brief	Prepare information of all characters in a page, with option.
+ *
+ * @param[in]	pdfPage		Handle to a valid <b>FSCRT_PAGE</b> object.
+ * @param[in]	option		An integer value that specifies the parsing option.<br>
+ * 							Please refer to macro definitions <b>FSPDF_TEXT_PARSEOPTION_XXX</b> and this should be one or a combination of these macros.<br>
+ * 							If set to 0, this function will be same with function ::FSPDF_TextPage_Load.
+ * @param[out]	textPage	Pointer to a <b>FSPDF_TEXTPAGE</b> handle to receive a new PDF text page handle if successful.<br>
+ * 							Application should release this handle if not use it any more by calling function ::FSPDF_TextPage_Release.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>pdfPage</i> or <i>textPage</i> is a <b>NULL</b> pointer, or parameter <i>option</i> is invalid.<br>
+ *			::FSCRT_ERRCODE_INVALIDTYPE if parameter <i>pdfPage</i> is not a type of PDF page.<br>
+ *			::FSCRT_ERRCODE_INVALIDLICENSE if the current license is not authorized or access to text page is not allowed.<br>
+ *			::FSCRT_ERRCODE_NOTPARSED if parameter <i>pdfPage</i> is not parsed.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot load text page because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @note	The application must call function ::FSPDF_TextPage_Release to release the loaded text page handle.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>pdfPage</i>: this handle is long-term partially recoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_LoadWithOption(FSCRT_PAGE pdfPage, FS_INT32 option, FSPDF_TEXTPAGE* textPage);
+
+/**
+ * @brief	Release all resources allocated for a PDF text page handle.
+ *			
+ * @param[in]	textPage		Handle to a <b>FSPDF_TEXTPAGE</b> object returned by function ::FSPDF_TextPage_Load.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i> is a <b>NULL</b> pointer.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is not thread safe. Do not call it for the same objects under multi-threaded environment;
+ *				otherwise, the application should be synchronized.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_Release(FSPDF_TEXTPAGE textPage);
+
+/**
+ * @brief	Get count of characters in a page. 
+ *
+ * @details	Generated characters, such as additional space and new line characters, are also counted.<br>
+ *			Characters in a page are from a "stream". Inside the stream, each character has an index. 
+ *			This index is used in most PDF text page related functions and 
+ *			the first character in the page has an index value of zero.
+ *			
+ * @param[in]	textPage		Handle to a <b>FSPDF_TEXTPAGE</b> object returned by function ::FSPDF_TextPage_Load.
+ * @param[out]	count			Pointer to a ::FS_INT32 object that receives the count of characters in the page. 
+ *								If an error occurs, this will be set to -1.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i> or <i>count</i> is a <b>NULL</b> pointer.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get the count of character because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_CountChars(FSPDF_TEXTPAGE textPage, FS_INT32* count);
+
+/**
+ * @brief	Get text content in a page, within a specific character range.
+ *			
+ * @param[in]	textPage		Handle to a <b>FSPDF_TEXTPAGE</b> object returned by function ::FSPDF_TextPage_Load.
+ * @param[in]	start			A zero-based index of character. It'll be the first character in text content.
+ *								Range: from 0 to (charcount -1). <i>charcount</i> is returned by function ::FSPDF_TextPage_CountChars.
+ * @param[in]	count			Count of characters. -1 means to get the whole characters in the page.<br>
+ *								Especially, when parameter <i>count</i> is larger than (charcount - <i>start</i>), 
+ *								all the rest character (from <i>start</i>) will be counted.
+ * @param[out]	chars			Pointer to a ::FSCRT_BSTR structure that receives the text string. It's a UTF-8 string.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i> or <i>chars</i> is a <b>NULL</b> pointer.<br>
+ * 			::FSCRT_ERRCODE_NOTFOUND if parameter <i>start</i> or <i>count</i> is out of range.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ * 			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot retrieve characters because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_GetChars(FSPDF_TEXTPAGE textPage, FS_INT32 start, FS_INT32 count, FSCRT_BSTR* chars);
+
+/**
+ * @brief	Get the unicode representation of a character in a page.
+ *
+ * @param[in]	textPage	Handle to a <b>FSPDF_TEXTPAGE</b> object returned by function ::FSPDF_TextPage_Load.
+ * @param[in]	index		A zero-based index of character. 
+ *							Range: from 0 to (charcount -1). <i>charcount</i> is returned by function ::FSPDF_TextPage_CountChars.
+ * @param[out]	unicode		Pointer to a ::FS_DWORD object to receive the character's unicode, in UTF-32 encoding.
+ * 
+ * @return		::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *				::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i> or <i>unicode</i> is a <b>NULL</b> pointer.<br>
+ *				::FSCRT_ERRCODE_NOTFOUND if parameter <i>index</i> is out of range.<br>
+ *				::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *				::FSCRT_ERRCODE_ERROR if the function cannot retrieve characters because of any other reason.<br>
+ *				For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ * 
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_GetUnicode(FSPDF_TEXTPAGE textPage, FS_INT32 index, FS_DWORD* unicode);
+
+/**
+ * @brief	Export text content in a page to a specific file handle.
+ *
+ * @details	Encode of the text is UTF-8.
+ *
+ * @param[in]	textPage		Handle to a <b>FSPDF_TEXTPAGE</b> object returned by function ::FSPDF_TextPage_Load.
+ * @param[in]	file			Handle to a <b>FSCRT_FILE</b> object which can be a file object or memory buffer to export the text.<br>
+ *								This can be created by fucntion ::FSCRT_File_Create or ::FSCRT_File_CreateFromMemory.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i> or <i>file</i> is a <b>NULL</b> pointer.<br>
+ *			::FSCRT_ERRCODE_FILE if the function cannot access the file handle.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot export text to the file handle because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT 	FSPDF_TextPage_ExportToFile(FSPDF_TEXTPAGE textPage, FSCRT_FILE file);
+
+/**
+ * @brief	Get character information of a specific character.
+ *			
+ * @param[in]	textPage		Handle to a <b>FSPDF_TEXTPAGE</b> object returned by function ::FSPDF_TextPage_Load.
+ * @param[in]	charIndex		A zero-based index of character. 
+ *								Range: from 0 to (charcount - 1).<i>charcount</i> is returned by function ::FSPDF_TextPage_CountChars.
+ * @param[out]	info			Pointer to a ::FSPDF_TEXTPAGE_CHARINFO structure that receives character information of the specific character.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i> or <i>fontSize</i> is a <b>NULL</b> pointer.<br>
+ * 			::FSCRT_ERRCODE_NOTFOUND if parameter <i>charIndex</i> is out of range.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ * 			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get character information because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_GetCharInfo(FSPDF_TEXTPAGE textPage, FS_INT32 charIndex, FSPDF_TEXTPAGE_CHARINFO* info);
+
+/**
+ * @brief	Get the character index at or around a specific position on the page.
+ *
+ * @param[in]	textPage		Handle to a <b>FSPDF_TEXTPAGE</b> object returned by function ::FSPDF_TextPage_Load.
+ * @param[in]	x				Value of x position in PDF "user space". 
+ * @param[in]	y				Value of y position in PDF "user space". 
+ * @param[in]	tolerance		Tolerance value for character hit detection, in point units. This should not be a negative.
+ * @param[out]	charIndex		Pointer to a ::FS_INT32 object that receives the zero-based index of the character at, or nearby point (x,y). 
+ *								Specially, if there are several characters near by point (x, y), the smallest character index will be returned. <br> 
+ *								If there is no character at or nearby the point, this parameter will be set to -1 as a result. <br>
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i>, or <i>charIndex</i> is a <b>NULL</b> pointer,
+*			 or parameter <i>tolerance</i> is negative.<br>
+ * 			::FSCRT_ERRCODE_NOTFOUND if no character is found at the specified position.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get the index of character at or nearby a specific position because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_GetCharIndexAtPos(FSPDF_TEXTPAGE textPage, FS_FLOAT x, FS_FLOAT y, FS_FLOAT tolerance, FS_INT32* charIndex);
+
+/**
+ * @deprecated	Current function has been deprecated since Foxit PDF SDK 4.3. So, not recommend to use current function any more.
+ *
+ * @brief	Get index of next character of a specific character in a specific direction.
+ *
+ * @param[in]	textPage		Handle to a <b>FSPDF_TEXTPAGE</b> object returned by function ::FSPDF_TextPage_Load.
+ * @param[in]	curIndex		A zero-based index for current character. 
+ *								Range: from 0 to (charcount - 1).<i>charcount</i> is returned by function ::FSPDF_TextPage_CountChars.
+ * @param[in]	direction		Indicates the direction to get the next character.
+ *								Please refer to macro definitions <b>FSPDF_TEXTDIRECTION_XXX</b> and this should be one of these macros.
+ * @param[out]	nextIndex		Pointer to a ::FS_INT32 object that receives a zero-based index for the next character. <br>
+ *								The meaning of some special return values for errors are:<br>
+ *								<ul>
+ *								<li>-1 : reach the beginning of the page</li> 
+ *								<li>-2 : reach the end of the page</li>
+ *								<li>-3 : other error</li>
+ *								</ul>
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i> or <i>nextIndex</i> is a <b>NULL</b> pointer, or <i>direction</i> is invalid.<br>
+ * 			::FSCRT_ERRCODE_NOTFOUND if parameter <i>curIndex</i> is out of range, or no next character is found.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get the index of character by direction because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT 	FSPDF_TextPage_GetNextCharIndexByDirection(FSPDF_TEXTPAGE textPage, FS_INT32 curIndex, FS_INT32 direction, FS_INT32* nextIndex);
+
+/*******************************************************************************/
+/* Text selection                                                              */
+/*******************************************************************************/
+/**
+ * @brief	Get a text selection handle by specific character range.
+ *
+ * @param[in]		textPage		Handle to a <b>FSPDF_TEXTPAGE</b> object returned by function ::FSPDF_TextPage_Load.
+ * @param[in]		start			A zero-based index of the start character. 
+ *									Range: from 0 to (charcount - 1).<i>charcount</i> is returned by function ::FSPDF_TextPage_CountChars.
+ * @param[in]		count			Count of characters to be extracted. -1 means cover the whole characters in the page.
+ * @param[out]		textSelection	Pointer to a <b>FSPDF_TEXTSELECTION</b> handle to receive a new PDF text selection handle if successful.<br>
+ *									Application should release this handle if not use by calling function ::FSPDF_TextSelection_Release.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i> or <i>textSelection</i> is a <b>NULL</b> pointer.<br>
+ * 			::FSCRT_ERRCODE_NOTFOUND if parameter <i>start</i> or <i>count</i> is out of range.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ * 			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot select text by range because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_SelectByRange(FSPDF_TEXTPAGE textPage, FS_INT32 start, FS_INT32 count, FSPDF_TEXTSELECTION* textSelection);
+
+/**
+ * @brief	Get a text selection handle by specific rectangle.
+ *
+ * @param[in]		textPage		Handle to a <b>FSPDF_TEXTPAGE</b> object returned or the parameter ::FSPDF_TextPage_Load.
+ * @param[in]		rect			Pointer to a ::FSCRT_RECTF structure that specifies rectangle range for selection.
+ * @param[out]		textSelection	Pointer to a <b>FSPDF_TEXTSELECTION</b> handle to receive a new PDF text selection handle if success.<br>
+ *									Application should release this handle if not use by calling function ::FSPDF_TextSelection_Release.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i>, <i>rect</i> or <i>textSelection</i> is a <b>NULL</b> pointer.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ * 			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot select text by rectangle because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_SelectByRectangle(FSPDF_TEXTPAGE textPage, const FSCRT_RECTF* rect, FSPDF_TEXTSELECTION* textSelection);
+
+/**
+ * @brief	Release all resources allocated for a PDF text selection handle.
+ *			
+ * @param[in]	textSelection	Handle to a <b>FSPDF_TEXTSELECTION</b> object to be released.
+ *								It can be returned by function ::FSPDF_TextPage_SelectByRange, ::FSPDF_TextPage_SelectByRectangle, 
+ *								::FSPDF_TextSearch_GetSelection, or ::FSPDF_TextLink_GetSelection.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSelection</i> is a <b>NULL</b> pointer.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is not thread safe. Do not call it for the same objects under multi-threaded environment;
+ *				otherwise, the application should be synchronized.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term recoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSelection_Release(FSPDF_TEXTSELECTION textSelection);
+
+/**
+ * @brief	Get bounding box(a rectangular area) of a PDF text selected area.
+ *
+ * @details	Bounding box is the smallest rectangle to enclose the entire selected chars.
+ *
+ * @param[in]	textSelection	Handle to a <b>FSPDF_TEXTSELECTION</b> object returned by function ::FSPDF_TextPage_SelectByRange, 
+ *								::FSPDF_TextPage_SelectByRectangle, ::FSPDF_TextSearch_GetSelection, or ::FSPDF_TextLink_GetSelection.
+ * @param[out]	bbox			Pointer to a ::FSCRT_RECTF structure that receives the 4 boundaries in PDF page space units(left, bottom, right, top) 
+ *								of the bounding box. 
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSelection</i> or <i>bbox</i> is a <b>NULL</b> pointer.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get bounding box of selection area because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSelection_GetBBox(FSPDF_TEXTSELECTION textSelection, FSCRT_RECTF* bbox);
+
+/** 
+ * @brief	Extract the whole text from a PDF text selected area.
+ *
+ * @param[in]	textSelection	Handle to a <b>FSPDF_TEXTSELECTION</b> object returned by function ::FSPDF_TextPage_SelectByRange, 
+ *								::FSPDF_TextPage_SelectByRectangle, ::FSPDF_TextSearch_GetSelection, or ::FSPDF_TextLink_GetSelection.
+ * @param[out]	chars			Pointer to a ::FSCRT_BSTR structure that receives the text. It's a UTF-8 string.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSelection</i> or <i>chars</i> is a <b>NULL</b> pointer.<br>
+ * 			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get characters in selection area because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSelection_GetChars(FSPDF_TEXTSELECTION textSelection, FSCRT_BSTR* chars);
+
+/** 
+ * @brief	Count the number of all rectangular areas of segments in a PDF text selected area.
+ *
+ * @details	This function, along with fucntion ::FSPDF_TextSelection_GetPieceRect, can be used to detect the position 
+ *			of a text segment in a PDF page. <br>
+ *			It is the area corresponding to the text segment that is to be highlighted. <br>
+ *			It will automatically merge small character boxes into bigger ones if those characters are on the same line with the same font settings.
+ *
+ * @param[in]	textSelection	Handle to a <b>FSPDF_TEXTSELECTION</b> object returned by function ::FSPDF_TextPage_SelectByRange, 
+ *								::FSPDF_TextPage_SelectByRectangle, ::FSPDF_TextSearch_GetSelection, or ::FSPDF_TextLink_GetSelection.
+ * @param[out]	count			Pointer to a ::FS_INT32 object that receives the count of segments. 
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSelection</i> or <i>count</i> is a <b>NULL</b> pointer.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get count of selected text pieces because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSelection_CountPieces(FSPDF_TEXTSELECTION textSelection, FS_INT32* count);
+
+/** 
+ * @brief	Get rectangular area of a specific segment, based on the result of the fucntion ::FSPDF_TextSelection_CountPieces.
+ *
+ * @param[in]	textSelection	Handle to a <b>FSPDF_TEXTSELECTION</b> object returned by function ::FSPDF_TextPage_SelectByRange, 
+ *								::FSPDF_TextPage_SelectByRectangle, ::FSPDF_TextSearch_GetSelection, or ::FSPDF_TextLink_GetSelection.
+ * @param[in]	pieceIndex		A zero-based index of the segment.
+ *								Range: from 0 to (segmentcount - 1).<i>segmentcount</i> is returned by function ::FSPDF_TextSelection_CountPieces.
+ * @param[out]	rect			Pointer to a ::FSCRT_RECTF structure that receives the 4 boundaries(left, top, right, bottom) of rectangle area.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSelection</i> or <i>rect</i> is a <b>NULL</b> pointer.<br>
+ * 			::FSCRT_ERRCODE_NOTFOUND if parameter <i>pieceIndex</i> is out of range.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get rectangle of text piece because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSelection_GetPieceRect(FSPDF_TEXTSELECTION textSelection, FS_INT32 pieceIndex, FSCRT_RECTF* rect);
+
+/** 
+ * @brief	Get rotation of the specific segment, based on the result returned by function ::FSPDF_TextSelection_CountPieces.
+ *
+ * @details Rotation value of text means how many degrees it costs to rotate the text in clockwise from horizontal direction to current direction.
+ *
+ * @param[in]	textSelection	Handle to a <b>FSPDF_TEXTSELECTION</b> object returned by function ::FSPDF_TextPage_SelectByRange, 
+ *								::FSPDF_TextPage_SelectByRectangle, ::FSPDF_TextSearch_GetSelection, or ::FSPDF_TextLink_GetSelection.
+ * @param[in]	pieceIndex		A zero-based index of the rotation segment.
+ *								Range: from 0 to (segmentcount - 1).<i>segmentcount</i> is returned by function ::FSPDF_TextSelection_CountPieces. 
+ * @param[out]	rotation		Pointer to a ::FS_INT32 object that receives the rotation for the text on the specific page rect.<br>
+ *								Range: 0 to 359 in clockwise. And -1 means failure.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSelection</i> or <i>rotation</i> is a <b>NULL</b> pointer.<br>
+ * 			::FSCRT_ERRCODE_NOTFOUND if parameter <i>pieceIndex</i> is out of range.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get rotation value of text piece because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSelection_GetPieceRotation(FSPDF_TEXTSELECTION textSelection, FS_INT32 pieceIndex, FS_INT32* rotation);
+
+/** 
+ * @brief	Get index of the start character and the count of characters of a specific segment.
+ *
+ * @param[in]	textSelection	Handle to a <b>FSPDF_TEXTSELECTION</b> object returned by function ::FSPDF_TextPage_SelectByRange, 
+ *								::FSPDF_TextPage_SelectByRectangle, ::FSPDF_TextSearch_GetSelection, or ::FSPDF_TextLink_GetSelection.
+ * @param[in]	pieceIndex		A zero-based index of the segment, of which the character range is to be got.<br>
+ *								Range: from 0 to (segmentcount - 1).<i>segmentcount</i> is returned by function ::FSPDF_TextSelection_CountPieces.
+ * @param[out]	start			Pointer to a ::FS_INT32 object that receives the index of start character of the segment. -1 means error.
+ * @param[out]	count			Pointer to a ::FS_INT32 object that receives the count of characters in the segment. -1 means error.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSelection</i>, <i>start</i> or <i>count</i> is a <b>NULL</b> pointer.<br>
+ * 			::FSCRT_ERRCODE_NOTFOUND if parameter <i>pieceIndex</i> is out of range.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get character range of text piece because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSelection_GetPieceCharRange(FSPDF_TEXTSELECTION textSelection, FS_INT32 pieceIndex, FS_INT32* start, FS_INT32* count);
+
+/** 
+ * @brief	Get the layer array associated with a PDF text selected area.
+ *
+ * @details	Content in a PDF text selected area may be in several layers. This function is used to get a layer array which contains these layers.
+ *
+ * @param[in]		textSelection	Handle to a <b>FSPDF_TEXTSELECTION</b> object returned by function ::FSPDF_TextPage_SelectByRange, 
+ *									::FSPDF_TextPage_SelectByRectangle, ::FSPDF_TextSearch_GetSelection, or ::FSPDF_TextLink_GetSelection.
+ * @param[in]		layers			Pointer to a ::FSPDF_LAYERNODE structure which will be cleared.
+ * @param[in,out]	layerArray		Pointer to a ::FSCRT_ARRAY structure that receives the layer array.<br>
+ *									Please ensure to use function ::FSCRT_Array_Init (with <i>dataType</i> equals ::FSCRT_VT_OBJECT_LAYER) 
+ *									to initialize this, and application should call function ::FSCRT_Array_Clear to release this.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSelection</i>, <i>layers</i> or <i>layerArray</i> is a <b>NULL</b> pointer, 
+ *			or the data type of parameter <i>layerArray</i> isn't ::FSCRT_VT_OBJECT_LAYER.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get character range of text piece because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li>
+ *				<li> <i>layers</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSelection_GetLayerArray(FSPDF_TEXTSELECTION textSelection, FSPDF_LAYERNODE* layers, FSCRT_ARRAY* layerArray);
+
+/**
+ * @brief	Get a new PDF text selected area of visible content from a specific a PDF text selected area.
+ *
+ * @details	Content in a PDF text selected area may be in several layers. Whether the content is visible depends on the visibility of the layer 
+ *			that the content belongs to. If user just wants to get the visible content, this function can be used.
+ *
+ * @param[in]	textSelection		Handle to a <b>FSPDF_TEXTSELECTION</b> object returned by function ::FSPDF_TextPage_SelectByRange, 
+ *									::FSPDF_TextPage_SelectByRectangle, ::FSPDF_TextSearch_GetSelection, or ::FSPDF_TextLink_GetSelection.
+ * @param[in]	context				Handle to a <b>FSPDF_LAYERCONTEXT</b> object which is PDF layer context.
+ * @param[out]	visibleSelection	Pointer to a <b>FSPDF_TEXTSELECTION</b> object that receives the new selected area.<br>
+ *									Application should call function ::FSPDF_TextSelection_Release to release this.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if success.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>context</i>, <i>layer</i> or <i>visible</i>is <b>NULL</b>.<br>
+ * 			::FSCRT_ERRCODE_UNRECOVERABLE if an unrecoverable error occurs.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>context</i>: this handle is long-term partially recoverable.</li>
+ *				<li> <i>layer</i>: this handle is long-term recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSelection_GetVisibleSelection(FSPDF_TEXTSELECTION textSelection, FSPDF_LAYERCONTEXT context, FSPDF_TEXTSELECTION* visibleSelection);
+
+/*******************************************************************************/
+/* Text search                                                                 */
+/*******************************************************************************/
+/**
+ * @brief	Start a PDF text search process. 
+ *
+ * @details	This function only starts a search process. Then function ::FSPDF_TextSearch_FindNext or 
+ *			::FSPDF_TextSearch_FindPrev should be called to find the first matched pattern.<br>
+ *			If there's no text in the page, this function will return ::FSCRT_ERRCODE_ERROR.<br>
+ *			This function must be called before any other search related functions can be used for the page.
+ *
+ * @param[in]		textPage		Handle to a <b>FSPDF_TEXTPAGE</b> object returned by function ::FSPDF_TextPage_Load.
+ * @param[in]		searchPattern	Pointer to a UTF-8 pattern string to be found.
+ * @param[in]		flags			Indicate the find options. 0 means no special finding options. And it can be one or combination of the followings: <br>
+ *									<ul>
+ *									<li>::FSCRT_SEARCHFLAG_MATCHCASE</li>
+ *									<li>::FSCRT_SEARCHFLAG_MATCHWHOLEWORD</li>
+ *									<li>::FSCRT_SEARCHFLAG_CONSECUTIVE</li>
+ *									</ul>
+ * @param[in]		startIndex		A zero-based index specifying the character from which the search starts. -1 means from the end of the page.<br>
+ *									Range: from -1 to (charcount-1). <i>charcount</i> is returned by function ::FSPDF_TextPage_CountChars.<br>
+ * @param[out]		textSearch		Pointer to a <b>FSPDF_TEXTSEARCH</b> handle to receive a new PDF text search handle if successful.<br>
+ *									Application should release this handle if not use by calling function ::FSPDF_TextSearch_Release.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i>, <i>searchPattern</i> or <i>textSearch</i> is a <b>NULL</b> pointer,
+ *			or FSCRT_BSTR::str of <i>searchPattern</i> is NULL, or parameter <i>flags</i> is illegal.<br>
+ *			::FSCRT_ERRCODE_NOTFOUND if parameter <i>startIndex</i> is out of range.
+ * 			::FSCRT_ERRCODE_FORMAT if parameter <i>searchPattern</i> is not a UTF-8 string.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ * 			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot search text because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term recoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				<li> <i>textSearch</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_StartSearch(FSPDF_TEXTPAGE textPage, const FSCRT_BSTR* searchPattern, FS_DWORD flags, FS_INT32 startIndex, 
+									   FSPDF_TEXTSEARCH* textSearch);
+
+/** 
+ * @brief	Release all resources allocated for a PDF text search handle.
+ *
+ * @param[in]	textSearch		Handle to a <b>FSPDF_TEXTSEARCH</b> object returned by function ::FSPDF_TextPage_StartSearch. 
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSearch</i> is a <b>NULL</b> pointer.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is not thread safe. Do not call it to process same objects between multi-threads, 
+ *				or the application should maintain thread safety when it needs to process same objects under multi-threaded environments.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term recoverable.</li>
+ *				<li> <i>textSearch</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSearch_Release(FSPDF_TEXTSEARCH textSearch);
+
+/** 
+ * @brief	Search in the direction from start to end of the page.
+ *
+ * @param[in]	textSearch		Handle to a <b>FSPDF_TEXTSEARCH</b> object returned by function ::FSPDF_TextPage_StartSearch. 
+ * @param[out]	isMatch			Pointer to a ::FS_BOOL object that receives a boolean value which indicates whether a match is found or not. 
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSearch</i> or <i>isMatch</i> is a <b>NULL</b> pointer.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot find next matched pattern because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textSearch</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSearch_FindNext(FSPDF_TEXTSEARCH textSearch, FS_BOOL* isMatch);
+
+/** 
+ * @brief	Search in the direction from end to start of the page.
+ *
+ * @param[in]	textSearch		Handle to a <b>FSPDF_TEXTSEARCH</b> object returned by function ::FSPDF_TextPage_StartSearch. 
+ * @param[out]	isMatch			Pointer to a ::FS_BOOL object that receives a boolean value which indicates whether a match is found or not.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSearch</i> or <i>isMatch</i> is a <b>NULL</b> pointer.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot find previous matched pattern because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textSearch</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSearch_FindPrev(FSPDF_TEXTSEARCH textSearch, FS_BOOL* isMatch);
+
+/** 
+ * @brief	Get a text selection handle from a text search when a match is found. 
+ *
+ * @param[in]		textSearch		Handle to a <b>FSPDF_TEXTSEARCH</b> object returned by function ::FSPDF_TextPage_StartSearch. 
+ * @param[out]		textSelection	Pointer to a <b>FSPDF_TEXTSELECTION</b> handle to receive a new PDF text selection handle if successful.<br>
+ *									This handle can be used for PDF text selection related functions.<br>
+ *									Application should release this handle if not use by calling function ::FSPDF_TextSelection_Release.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textSearch</i> or <i>textSelection</i> is a <b>NULL</b> pointer.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ * 			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get text selection object for text search result because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textSearch</i>: this handle is long-term partially recoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextSearch_GetSelection(FSPDF_TEXTSEARCH textSearch, FSPDF_TEXTSELECTION* textSelection);
+
+/*******************************************************************************/
+/* Text link                                                                   */
+/*******************************************************************************/
+/**
+ * @brief	Process a PDF page text object to get URL formatted texts (as hyperlinks).
+ *
+ * @details	This function must be called before any other hyperlink related functions can be used.
+ *
+ * @param[in]		textPage		Handle to a <b>FSPDF_TEXTPAGE</b> object returned by function ::FSPDF_TextPage_Load.
+ * @param[out]		textLink		Pointer to a <b>FSPDF_TEXTLINK</b> handle to receive a new PDF text link handle if successful.<br>
+ *									Application should release this handle if not use by calling function ::FSPDF_TextLink_Release.<br>
+ *									If there's any error, it will be <b>NULL</b>.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_NOTFOUND if no hyperlink is found in a text page.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textPage</i> or <i>textLink</i> is a <b>NULL</b> pointer.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if a unrecoverable OOM happens.<br>
+ * 			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot extract hyperlinks in a text page because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term recoverable.</li>
+ *				<li> <i>textPage</i>: this handle is long-term partially recoverable.</li>
+ *				<li> <i>textLink</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextPage_ExtractLinks(FSPDF_TEXTPAGE textPage, FSPDF_TEXTLINK* textLink);
+
+/**
+ * @brief	Release all resources allocated for a PDF text link handle.
+ *
+ * @param[in]	textLink		Handle to a <b>FSPDF_TEXTLINK</b> object returned by function ::FSPDF_TextPage_ExtractLinks.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textLink</i> is a <b>NULL</b> pointer.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is not thread safe. Do not call it for the same objects under multi-threaded environment;
+ *				otherwise, the application should be synchronized.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term recoverable.</li>
+ *				<li> <i>textLink</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextLink_Release(FSPDF_TEXTLINK textLink);
+
+/**
+ * @brief	Get count of the URL formatted texts inside a page.
+ *
+ * @param[in]	textLink		Handle to a <b>FSPDF_TEXTLINK</b> object returned by function ::FSPDF_TextPage_ExtractLinks.
+ * @param[out]	linkCount		Pointer to a ::FS_INT32 object that receives the count of links. 
+ *								If there's any error, it will be -1.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textLink</i> or <i>linkCount</i> is a <b>NULL</b> pointer.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textLink</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextLink_CountLinks(FSPDF_TEXTLINK textLink, FS_INT32* linkCount);
+
+/**
+ * @brief	Get the linked URL associated with a specific hyperlink.
+ *
+ * @param[in]	textLink		Handle to a <b>FSPDF_TEXTLINK</b> object returned by function ::FSPDF_TextPage_ExtractLinks.
+ * @param[in]	linkIndex		A zero-based index of the specific hyperlink. 
+ *								Range: from 0 to (linkcount - 1).<i>linkcount</i> is returned by function ::FSPDF_TextLink_CountLinks.
+ * @param[out]	linkURI			Pointer to a ::FSCRT_BSTR structure that receives the hyperlink URL. It's a UTF-8 string.
+ * 
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textLink</i> or <i>linkURI</i> is a <b>NULL</b> pointer.<br>
+ * 			::FSCRT_ERRCODE_NOTFOUND if parameter <i>linkIndex</i> is out of range.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ * 			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get URL because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.
+ *				 ::FSPDF_TextLink_CountLinks should be called first to calculate the count of links.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textLink</i>: this handle is long-term partially recoverable.</li>
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextLink_GetLink(FSPDF_TEXTLINK textLink, FS_INT32 linkIndex, FSCRT_BSTR* linkURI);
+
+/** 
+ * @brief	Get a PDF text selection handle from a specific hyperlink. 
+ *
+ * @param[in]		textLink		Handle to a <b>FSPDF_TEXTLINK</b> object returned by function ::FSPDF_TextPage_ExtractLinks. 
+ * @param[in]		linkIndex		A zero-based index for the specific hyperlink. 
+ *									Range: from 0 to (linkcount - 1).<i>linkcount</i> is returned by function ::FSPDF_TextLink_CountLinks.
+ * @param[out]		textSelection	Pointer to a <b>FSPDF_TEXTSELECTION</b> handle to receive a new PDF text selection handle if successful.<br>
+ *									This handle can be used for PDF text selection related functions.<br>
+ *									Application should release this handle if not use by calling function ::FSPDF_TextSelection_Release.
+ *
+ * @return	::FSCRT_ERRCODE_SUCCESS if succeeded.<br>
+ *			::FSCRT_ERRCODE_PARAM if parameter <i>textLink</i> or <i>textSelection</i> is a <b>NULL</b> pointer.<br>
+ * 			::FSCRT_ERRCODE_NOTFOUND if parameter <i>linkIndex</i> is out of range.<br>
+ *			::FSCRT_ERRCODE_UNRECOVERABLE if the function can not be recovered.<br>
+ * 			::FSCRT_ERRCODE_OUTOFMEMORY if there is not enough memory or if the memory access is wrong.<br>
+ *			::FSCRT_ERRCODE_ERROR if the function cannot get text selection for a link because of any other reason.<br>
+ *			For more error codes, please refer to macro definitions <b>FSCRT_ERRCODE_XXX</b>.
+ *
+ * @attention	<b>Thread Safety</b>: this function is thread safe.<br>
+ *				<b>OOM Information</b>:<br>
+ *				OOM handling is only for mobile platforms, not for server or desktop.<br>
+ *				<ul>
+ *				<li>This function is long-term unrecoverable.</li>
+ *				<li> <i>textLink</i>: this handle is long-term partially recoverable.</li>
+ *				<li> <i>textSelection</i>: this handle is long-term partially recoverable.</li> 
+ *				</ul>
+ *				Please refer to the document "Robust PDF Applications with Limited Memory" for more details.
+ */
+FS_RESULT	FSPDF_TextLink_GetSelection(FSPDF_TEXTLINK textLink, FS_INT32 linkIndex, FSPDF_TEXTSELECTION* textSelection);
+
+#ifdef __cplusplus
+};
+#endif
+
+/**@}*/ /* group FPDFTEXT */
+
+#endif /* _FSPDF_TEXTPAGE_R_H_ */
+

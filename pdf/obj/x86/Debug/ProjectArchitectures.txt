@@ -1,0 +1,2 @@
+C:\Users\v-yuyzhu\Documents\Visual Studio 2015\Projects\foxitSDK\foxitSDK\foxitSDK.vcxproj;x86
+C:\Users\v-yuyzhu\Documents\Visual Studio 2015\Projects\foxitSDK\pdf\pdfReader.csproj;x86

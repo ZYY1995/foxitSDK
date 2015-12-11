@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resources">
+      <UniqueIdentifier>fa5a83f1-84b8-4e64-9e71-5a9989869f29</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tga;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{63ecbc19-e8d9-4a9b-86c2-5feb762c9701}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\pdf">
+      <UniqueIdentifier>{080ad7f2-7b96-4533-b87c-e91f2ca19f72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib">
+      <UniqueIdentifier>{0bca5375-038d-4f45-bea3-684c535dea14}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="SDKDemoCommon.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="include\fs_app_r.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fs_barcode_w.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fs_base_r.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fs_codec_r.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fs_image_r.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fs_image_w.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fs_psi_w.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fs_renderer_r.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fsdk.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\ffdf_document_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\ffdf_document_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_annot_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_annot_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_async_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_base_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_document_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_document_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_form_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_form_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_layer_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_layer_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_markedcontent_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_markedcontent_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_objects_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_objects_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_page_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_page_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_pageobjects_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_pageobjects_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_reflow_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_security_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_security_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_signature_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_signature_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_textpage_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_watermark_r.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pdf\fpdf_watermark_w.h">
+      <Filter>include\pdf</Filter>
+    </ClInclude>
+    <ClInclude Include="SDKDemoCommon.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lib\fsdk_win10_arm.dll">
+      <Filter>lib</Filter>
+    </None>
+    <None Include="lib\fsdk_win10_x64.dll">
+      <Filter>lib</Filter>
+    </None>
+    <None Include="lib\fsdk_win10_x86.dll">
+      <Filter>lib</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\fsdk_win10_arm.lib">
+      <Filter>lib</Filter>
+    </Library>
+    <Library Include="lib\fsdk_win10_x64.lib">
+      <Filter>lib</Filter>
+    </Library>
+    <Library Include="lib\fsdk_win10_x86.lib">
+      <Filter>lib</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="lib\gsdk_key.txt">
+      <Filter>lib</Filter>
+    </Text>
+    <Text Include="lib\gsdk_sn.txt">
+      <Filter>lib</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
